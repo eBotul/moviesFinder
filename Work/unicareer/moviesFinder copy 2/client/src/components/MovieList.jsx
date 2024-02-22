@@ -1,9 +1,11 @@
 import React, {useEffect, useContext} from 'react'
 import MoviesFinder from '../apis/MoviesFinder'
 import {MoviesContext} from '../context/MoviesContext'
+import { useNavigate } from 'react-router';
 
 const MovieList = (props) => {
     const {movies, setMovies} = useContext(MoviesContext)
+    let navigate = useNavigate();
     useEffect(()=>{
       const fetchData = async () => {
         try {
@@ -16,6 +18,20 @@ const MovieList = (props) => {
       fetchData()
     },[])
 
+    const handleDelete = async id =>{
+      try {
+        const response = await MoviesFinder.delete(`/${id}`)
+        setMovies(movies.filter(movie=>{
+          return movie.id !== id
+        }))
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    const handleUpdate = async id =>{
+      navigate(`/movies/${id}/update`)
+    }
 
   return (
     <div className='list-group'>
@@ -36,18 +52,11 @@ const MovieList = (props) => {
               <td>{movie.name}</td>
               <td>{movie.studio}</td>
               <td>{movie.ratings}</td>
-              <td><button className="btn btn-warning">Update</button></td>
-              <td><button className="btn btn-danger">Delete</button></td>
+              <td><button onClick={()=>handleUpdate(movie.id)} className="btn btn-warning">Update</button></td>
+              <td><button onClick={()=>handleDelete(movie.id)}  className="btn btn-danger">Delete</button></td>
             </tr>
           )
         })}
-            {/* <tr>
-                <td>ANT MAN</td>
-                <td>dc</td>
-                <td>3</td>
-                <td><button className="btn btn-warning">Update</button></td>
-                <td><button className="btn btn-danger">Delete</button></td>
-            </tr> */}
         </tbody>
       </table>
     </div>
